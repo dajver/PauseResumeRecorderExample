@@ -4,11 +4,17 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 
-import com.github.republicofgavin.pauseresumeaudiorecorder.PauseResumeAudioRecorder;
+import com.project.recordaudioexample.audio.PauseResumeAudioRecorder;
+import com.project.recordaudioexample.audio.view.AudioVisualizationView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PauseResumeAudioRecorder.OnAmplitudeRunning {
+
+    @BindView(R.id.audioVisualizationView)
+    AudioVisualizationView audioVisualizationView;
 
     private PauseResumeAudioRecorder mediaRecorder;
 
@@ -16,8 +22,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         mediaRecorder = new PauseResumeAudioRecorder();
+        mediaRecorder.setOnAmplitudeRunning(this);
         mediaRecorder.setAudioFile(Environment.getExternalStorageDirectory() + "/Record");
     }
 
@@ -34,18 +42,23 @@ public class MainActivity extends AppCompatActivity {
         mediaRecorder.startRecording();
     }
 
-    @OnClick(R.id.recordButton)
+    @OnClick(R.id.pauseButton)
     public void onPauseClick() {
         mediaRecorder.pauseRecording();
     }
 
-    @OnClick(R.id.recordButton)
+    @OnClick(R.id.stopButton)
     public void onStopClick() {
         mediaRecorder.stopRecording();
     }
 
-    @OnClick(R.id.recordButton)
+    @OnClick(R.id.resumeButton)
     public void onResumeClick() {
         mediaRecorder.resumeRecording();
+    }
+
+    @Override
+    public void getAmplitude(double amplitude, int currentState) {
+        audioVisualizationView.updateProgress((int) amplitude);
     }
 }
